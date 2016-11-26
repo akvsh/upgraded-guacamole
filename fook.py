@@ -6,6 +6,8 @@ import time
 
 #global variable lol
 PIECE_FOLDER = "Pieces/"
+pygame.mixer.music.load("sandstorm.mp3");
+pygame.mixer.music.play();
 
 backcolour = (255, 255, 255)
 boardcolour = (0, 0, 0)
