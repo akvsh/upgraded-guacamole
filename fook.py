@@ -1,11 +1,11 @@
 import pygame
 import sys
 import pm
-from pm import WHITE, BLACK
 import random
 import time
 
-Shit = (113, 119, 30)
+#global variable lol
+PIECE_FOLDER = "Pieces/"
 
 backcolour = (255, 255, 255)
 boardcolour = (0, 0, 0)
@@ -14,63 +14,58 @@ blue = (0, 0, 128)
 green = (0, 255, 0)
 brown = (153, 76, 0)
 purple = (138, 6, 255)
-
 pink = (255, 180, 180)
+orange = (255, 215, 0)
 
 DaihansFaveColour = (152, 152, 211)
 AkashColour = (240, 42, 0)
+Shit = (113, 119, 30)
 
 marginsize = 30
-screenwidth = 1024 # 640 for a smaller screen
-screenheight = 640 # 480 for a smaller screen
+screenwidth = 1024
+screenheight = 640
 
-xcorner = max(0, screenwidth - screenheight) / 2 + marginsize
-ycorner = max(0, screenheight - screenwidth) / 2 + marginsize
-boardsize = min(screenheight, screenwidth) - 2 * marginsize
+# Assumes width > height
+xcorner = (screenwidth - screenheight) / 2 + marginsize
+ycorner = marginsize
+boardsize = screenheight - 2 * marginsize
 squaresize = boardsize / 8
 
 buttonWidth, buttonHeight = 75, 12
 buttonx = screenwidth / 2 - buttonWidth / 2
 buttony = screenheight - 3*(marginsize / 4)
-undox, flipx = buttonx + 100, buttonx - 100
+surpx, fookx = buttonx + 100, buttonx - 100
 
 pygame.init()
 screen = pygame.display.set_mode((screenwidth, screenheight))
-MessageFont = pygame.font.SysFont("comic sans", 18)
+MessageFont = pygame.font.SysFont("comic sans", 50)
 ButtonFont = pygame.font.SysFont("comic sans", 20)
 
 
 # helper to obtain file and rank
-def fileAndRank(sqr):
-    if mainState.FLIP:
-        return 7 - sqr%8, sqr/8
-    else:
-        return sqr%8, 7 - sqr/8
-
+def fileAndRank(sqr): return sqr%8, 7 - sqr/8
 
 def checkType(event):
     # Check for quit
-    if event.type == pygame.QUIT:
-        pygame.quit(); sys.exit();
-    # Reset the game if 'new game' selected
+    if event.type == pygame.QUIT: pygame.quit(); sys.exit();
     if event.type == pygame.MOUSEBUTTONUP:
         mousex, mousey = event.pos
         if buttonx < mousex < buttonx + buttonWidth and buttony < mousey < buttony + buttonHeight:
+            # Reset the game if 'new game' selected
             resetState()
-            return True
-        elif undox < mousex < undox + buttonWidth and buttony < mousey < buttony + buttonHeight:
-            UndoStuff()
-            return True
-        elif flipx < mousex < flipx + buttonWidth and buttony < mousey < buttony + buttonHeight:
-            mainState.FLIP = not(mainState.FLIP)
+        elif surpx < mousex < surpx + buttonWidth and buttony < mousey < buttony + buttonHeight:
+            generateMeme()
+        elif fookx < mousex < fookx + buttonWidth and buttony < mousey < buttony + buttonHeight:
             drawStuff()
-            return True
+        else: return False
+        return True
 
 
-# Draws a message above the board
+# Draws an obnoxious message across the board
 def displayMessage(message, xcoord):
-    message = MessageFont.render(message, 1, blue)
-    screen.blit(message, (xcoord, marginsize /2))
+    pygame.draw.rect(screen, boardcolour, (xcoord, xcoord, 250, 30), 0)
+    message = MessageFont.render(message, 10, green)
+    screen.blit(message, (xcoord, xcoord))
     pygame.display.update()
     mainState.END = True
 
@@ -83,10 +78,12 @@ def loadAndTransform(image, size):
 def generateColour(seed=False):
     hashMap = random.random()
     if seed: 
-        if (hashMap) <= 0.5:
+        if (hashMap) <= 0.33:
             return AkashColour
-        else:
+        elif (hashMap) <= 0.66:
             return lightblue
+        else:
+            return orange
     if (hashMap) <= 0.5:
         return pink
     else:
@@ -94,14 +91,13 @@ def generateColour(seed=False):
 
 # Draws the board to the screen
 def drawBoard():
-    x, y = xcorner, ycorner
     k, size = squaresize, boardsize
-    pygame.draw.rect(screen, boardcolour, (x, y, size, size), 3)
+    pygame.draw.rect(screen, boardcolour, (xcorner, ycorner, size, size), 3)
     colour = generateColour(1)
     for sqr in range(64):
         f, r = fileAndRank(sqr)
-        sx = x + f*k + 2 # Add 2 to centre the board
-        sy = y + r*k + 2
+        sx = xcorner + f*k + 2 # Add 2 to centre the board
+        sy = ycorner + r*k + 2
         if (sqr/8)%2 == sqr%2:
             pygame.draw.rect(screen, generateColour(), (sx, sy, k, k))
         else:
@@ -112,7 +108,7 @@ def drawBoard():
 def drawPieces():
     k = squaresize
     for p in pm.allpieces:
-        pieceImage = loadAndTransform(p.picture, k)
+        pieceImage = loadAndTransform(PIECE_FOLDER + p.picture, k)
         for sqr in p.piecelist:
             f, r = fileAndRank(sqr)
             screen.blit(pieceImage, (xcorner + f*k, ycorner + r*k))
@@ -126,8 +122,8 @@ def drawButtons():
         messagex = x + 75//2 - ((len(text) * 75//11) / 2) # Magic to centre text
         screen.blit(ButtonFont.render(text, 1, blue), (messagex , y+3))
     buttonHelper(buttonx, "NEW GAME")
-    buttonHelper(undox, "UNDO ")
-    buttonHelper(flipx, "FUCK ME UP")
+    buttonHelper(surpx, "SURPRISE")
+    buttonHelper(fookx, "FUCK ME UP")
     
 
 # Highlights the specified square
@@ -146,8 +142,6 @@ def squareClicked(mousex, mousey):
         fil = x // k
         rank = y // k
         sqr = 8*(7-rank) + fil
-        if mainState.FLIP:
-            sqr = 63 - sqr
         return sqr
     return -1
 
@@ -176,8 +170,6 @@ def drawStuff(sqr=-1):
 class GameState:
     def __init__(self):
         self.movenumber = 0
-        self.turn = WHITE
-        self.FLIP = False
         self.END = False
 
 mainState = GameState()
@@ -185,33 +177,20 @@ mainState = GameState()
 def resetState():
     global mainState
     mainState = GameState()
-    pm.resetgame()
+    pm.resetboard()
     drawStuff()
 
-
-# Undoes a move !!
-def UndoStuff():
-    if mainState.END: mainState.END = False
-    pm.UndoMove()
-    pm.UndoMove()
+def generateMeme():
+    global PIECE_FOLDER
+    if PIECE_FOLDER == "Memes/": PIECE_FOLDER = "Pieces/"
+    else: PIECE_FOLDER = "Memes/"
     drawStuff()
-    if mainState.movenumber == 1:
-        mainState.turn = WHITE
-    if mainState.movenumber != 0:
-        mainState.movenumber -= 1
-
 
 # Switches turn and increases move number
-def switchTurn(turn):
-    if turn == WHITE:
-        mainState.turn = BLACK
-        mainState.movenumber += 1
-    elif turn == BLACK:
-        mainState.turn = WHITE
-
+def switchTurn(): mainState.movenumber += 1
 
 # Makes a move for the computer
-def DoCompTurn(turn):
+def DoCompTurn():
     if mainState.END: return
     if mainState.movenumber <= 1:
         start, end = 52, 36
@@ -219,16 +198,15 @@ def DoCompTurn(turn):
         start, end = 59, 31
     pm.MovePiece(start, end)
     drawStuff(end)
-    switchTurn(turn)
+    switchTurn()
 
 
 # Moves a piece selected by the player
-def DoPlayerTurn(turn):
+def DoPlayerTurn():
     temp = -1
     while (True):
         for event in pygame.event.get():
-            if checkType(event):
-                return
+            if checkType(event): return
             if event.type == pygame.MOUSEBUTTONUP:
                 mousex, mousey = event.pos
                 msqr = squareClicked(mousex, mousey)
@@ -239,24 +217,19 @@ def DoPlayerTurn(turn):
                         for s in pm.PieceMovement(temp):
                             if msqr == s:
                                 pm.MovePiece(temp, msqr)
-                                drawStuff(msqr)
-                                switchTurn(turn)
+                                drawStuff()
+                                switchTurn()
                                 return
                         drawStuff()
                         temp = -1
 
                     # Displays valid moves
                     else:
-                        if turn == WHITE:
-                            folder = pm.whitepieces
-                        elif turn == BLACK:
-                            folder = pm.blackpieces
-                        for piece in folder:
-                            if id(piece) == pm.boardlist[msqr]:
-                                drawMoves(msqr)
-                                temp = msqr
-                                break
-
+                        for piece in pm.whitepieces:
+                            for sqr in piece.piecelist:
+                                if sqr == msqr:
+                                    drawMoves(msqr)
+                                    temp = msqr
                                              
 def main():
     # Initialize things
@@ -265,20 +238,18 @@ def main():
 
     # Main game loop:
     while (True):
-        for event in pygame.event.get():
-            checkType(event)
+        for event in pygame.event.get(): checkType(event)
+
         # Checks for mate
         if not mainState.END:
-            mate_status = pm.isMated(mainState.turn)
+            mate_status = pm.isMated()
         if mate_status:
             displayMessage(mate_status + "!", screenwidth / 2 - marginsize)
-            continue
 
-        elif mainState.turn == WHITE:
-            DoPlayerTurn(mainState.turn)
+        elif mainState.movenumber % 2 == 0: # White's turn
+            DoPlayerTurn()
 
-        elif mainState.turn == BLACK:
-            DoCompTurn(mainState.turn)
+        else: DoCompTurn()
 
 #pyjsdl.display.setup(run)            
 main()
