@@ -47,7 +47,7 @@ def resetboard():
 
 # Returns the piece on square num
 def pieceatsqr(num):
-    for y in allpieces:
+    for y in wp, bp, bq:
         for j in y.piecelist:
             if j == num:
                 return y
@@ -72,8 +72,5 @@ def PieceMovement(i):
     return p
 
 # determines whether the user has been checkmated
-def isMated():
-    fook = False
-    for i in bq.piecelist:#pieceatsqr(31)
-        if i == 31: fook = True
-    if fook: return 'CHECKMATE'
+def isMated(): 
+    if bq.piecelist == [31]: return 'CHECKMATE'

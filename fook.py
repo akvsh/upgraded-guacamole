@@ -1,27 +1,11 @@
+from colours import *
 import pygame
 import sys
 import pm
-import random
 import time
 
 #global variable lol
 PIECE_FOLDER = "Pieces/"
-pygame.mixer.music.load("sandstorm.mp3");
-pygame.mixer.music.play();
-
-backcolour = (255, 255, 255)
-boardcolour = (0, 0, 0)
-lightblue = (102, 255, 255)
-blue = (0, 0, 128)
-green = (0, 255, 0)
-brown = (153, 76, 0)
-purple = (138, 6, 255)
-pink = (255, 180, 180)
-orange = (255, 215, 0)
-
-DaihansFaveColour = (152, 152, 211)
-AkashColour = (240, 42, 0)
-Shit = (113, 119, 30)
 
 marginsize = 30
 screenwidth = 1024
@@ -42,6 +26,9 @@ pygame.init()
 screen = pygame.display.set_mode((screenwidth, screenheight))
 MessageFont = pygame.font.SysFont("comic sans", 50)
 ButtonFont = pygame.font.SysFont("comic sans", 20)
+
+#pygame.mixer.music.load("sandstorm.mp3");
+#pygame.mixer.music.play();
 
 
 # helper to obtain file and rank
@@ -76,20 +63,6 @@ def displayMessage(message, xcoord):
 def loadAndTransform(image, size):
     loadedImage = pygame.image.load(image)
     return pygame.transform.smoothscale(loadedImage, (size, size))
-
-def generateColour(seed=False):
-    hashMap = random.random()
-    if seed: 
-        if (hashMap) <= 0.33:
-            return AkashColour
-        elif (hashMap) <= 0.66:
-            return lightblue
-        else:
-            return orange
-    if (hashMap) <= 0.5:
-        return pink
-    else:
-        return DaihansFaveColour
 
 # Draws the board to the screen
 def drawBoard():
@@ -260,5 +233,5 @@ def main():
 #"Pieces/WhiteRook.png", "Pieces/WhitePawn.png", "Pieces/BlackKing.png", "Pieces/BlackQueen.png", 
 #"Pieces/BlackBishop.png", "Pieces/BlackKnight.png","Pieces/BlackRook.png", "Pieces/BlackPawn.png"]
 
-pyjsdl.display.setup(run)            
+#pyjsdl.display.setup(run)            
 main()
