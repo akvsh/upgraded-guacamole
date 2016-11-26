@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>URL Shortener</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,100' rel='stylesheet' type='text/css'>
+    <script src="jquery-2.2.1.js"></script>
+    <script src="popup.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #e9ece5;
+            border-style: solid;
+            border: 10%;
+            padding: 10%;
+            border-color: #62bcfa;
+        }
+        
+        #title {
+            font-size: 2em;
+            text-align: center;
+            color: #3b3a36;
+            text-decoration: underline;
+        }
+        
+        #copy-url {
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 2.5em;
+            border: 1px solid #b3c2bf;
+            text-decoration: none;
+            text-align: left;
+            background-color: #c0dfd9;
+            color: #3b3a36;
+        }
+        
+        #copy-url:hover {
+            background-color: #b3c2bf !important;
+        }
+        
+        #short-url {
+            text-align: center;
+            font-size: 2em;
+            color: #3b3a36;
+        }
+        
+        #kek {
+            text-align: center;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div>
+        <h1 id="title">Shortened URL</h1>
+        <h2 id="short-url">https://stuff/morestuff</h2>
+        <div id="kek">
+            <button class="fa fa-clipboard" id="copy-url"> COPY </button>
+        </div>
+    </div>
+</body>
+
+</html>
