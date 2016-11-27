@@ -12,20 +12,21 @@ screenwidth = 1024
 screenheight = 640
 
 # Assumes width > height
-xcorner = (screenwidth - screenheight) / 2 + marginsize
+xcorner = (screenwidth - screenheight) / 2 + marginsize + 200
 ycorner = marginsize
 boardsize = screenheight - 2 * marginsize
 squaresize = boardsize / 8
 
-buttonWidth, buttonHeight = 75, 12
-buttonx = screenwidth / 2 - buttonWidth / 2
-buttony = screenheight - 3*(marginsize / 4)
-surpx, fookx = buttonx + 100, buttonx - 100
+buttonWidth, buttonHeight = 200, 30
+buttonx = 4 * marginsize # everything hardcoded :)
+buttony = 450 + marginsize
+surpy = buttony + marginsize
+fooky = surpy + marginsize
 
 pygame.init()
 screen = pygame.display.set_mode((screenwidth, screenheight))
 MessageFont = pygame.font.SysFont("comic sans", 50)
-ButtonFont = pygame.font.SysFont("comic sans", 20)
+ButtonFont = pygame.font.SysFont("comic sans", 30)
 
 #pygame.mixer.music.load("sandstorm.mp3");
 #pygame.mixer.music.play();
@@ -42,9 +43,9 @@ def checkType(event):
         if buttonx < mousex < buttonx + buttonWidth and buttony < mousey < buttony + buttonHeight:
             # Reset the game if 'new game' selected
             resetState()
-        elif surpx < mousex < surpx + buttonWidth and buttony < mousey < buttony + buttonHeight:
+        elif buttonx < mousex < buttonx + buttonWidth and surpy < mousey < surpy + buttonHeight:
             generateMeme()
-        elif fookx < mousex < fookx + buttonWidth and buttony < mousey < buttony + buttonHeight:
+        elif buttonx < mousex < buttonx + buttonWidth and fooky < mousey < fooky + buttonHeight:
             drawStuff()
         else: return False
         return True
@@ -63,6 +64,11 @@ def displayMessage(message, xcoord):
 def loadAndTransform(image, size):
     loadedImage = pygame.image.load(image)
     return pygame.transform.smoothscale(loadedImage, (size, size))
+
+def drawLogo():
+    logo = loadAndTransform("TerribleChess.png", 400)
+    screen.blit(logo, (0, 0))
+
 
 # Draws the board to the screen
 def drawBoard():
@@ -92,13 +98,13 @@ def drawPieces():
 
 # Draws the buttons below the board
 def drawButtons():
-    def buttonHelper(xcoord, text):
-        x, y = xcoord, buttony
+    def buttonHelper(ycoord, text):
+        x, y = buttonx, ycoord
         messagex = x + 75//2 - ((len(text) * 75//11) / 2) # Magic to centre text
         screen.blit(ButtonFont.render(text, 1, blue), (messagex , y+3))
-    buttonHelper(buttonx, "NEW GAME")
-    buttonHelper(surpx, "SURPRISE")
-    buttonHelper(fookx, "FUCK ME UP")
+    buttonHelper(buttony, "NEW GAME")
+    buttonHelper(surpy, "SURPRISE")
+    buttonHelper(fooky, "FUCK ME UP")
     
 
 # Highlights the specified square
@@ -137,6 +143,7 @@ def drawStuff(sqr=-1):
     screen.fill(backcolour)
     drawButtons()
     drawBoard()
+    drawLogo()
     if sqr != -1: drawHighlight(sqr)
     drawPieces()
 
@@ -168,11 +175,11 @@ def switchTurn(): mainState.movenumber += 1
 def DoCompTurn():
     if mainState.END: return
     if mainState.movenumber <= 1:
-        start, end = 52, 36
+        pm.MovePiece(52, 36, pm.bp)
+        drawStuff(36)
     else:
-        start, end = 59, 31
-    pm.MovePiece(start, end)
-    drawStuff(end)
+        pm.MovePiece(59, 31, pm.bq)
+        drawStuff(31)
     switchTurn()
 
 
@@ -191,7 +198,7 @@ def DoPlayerTurn():
                     if temp != -1:
                         for s in pm.PieceMovement(temp):
                             if msqr == s:
-                                pm.MovePiece(temp, msqr)
+                                pm.MovePiece(temp, msqr, pm.wp)
                                 drawStuff()
                                 switchTurn()
                                 return

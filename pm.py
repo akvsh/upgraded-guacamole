@@ -54,9 +54,9 @@ def pieceatsqr(num):
     return None
 
 # Moves the piece on start to end
-def MovePiece(start, end):
-    j = pieceatsqr(start)
-    updatepiece(j, start, end)
+def MovePiece(start, end, piece):
+    #j = pieceatsqr(start)
+    updatepiece(piece, start, end)
 
 # Returns a list of squares that are valid moves for the piece on square i
 def PieceMovement(i):
